@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <gtest/gtest.h>
+#include<benchmark/benchmark.h>
 #include "ThreadBST.h"
 
 
@@ -41,6 +42,30 @@ ss << tree;
 ASSERT_EQ(ss.str(), "24 42 ");
 }
 
+
+///бенчмарки
+
+static void BM_Insert(benchmark::State& state) {
+    ThreadSafeBST<int> tree;
+    for (auto _ : state) {
+        tree.insert(rand());
+    }
+}
+BENCHMARK(BM_Insert);
+
+static void BM_Find(benchmark::State& state) {
+    ThreadSafeBST<int> tree;
+    for (int i = 0; i < 10000; ++i) {
+        tree.insert(i);
+    }
+    for (auto _ : state) {
+        bool result = tree.find(rand() % 10000);
+        benchmark::DoNotOptimize(result);
+    }
+}
+BENCHMARK(BM_Find);
+
+
 int main(int argc, char**argv) {
     ThreadSafeBST<int> tree;
     tree.insert(5);
@@ -59,5 +84,7 @@ int main(int argc, char**argv) {
     }
     testing::InitGoogleTest(&argc,argv);
 // Вывод: 2 4 3 6 8 7 5
+    ::benchmark::Initialize(&argc,argv);
+    ::benchmark::RunSpecifiedBenchmarks();
     return RUN_ALL_TESTS();
 }
