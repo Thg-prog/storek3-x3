@@ -11,10 +11,9 @@ namespace laba2{
                     Node* right;
                     Node* left;
 
-                    Node(T value){
+                    explicit Node(T value) : info(value){
                         right = nullptr;
                         left = nullptr;
-                        info = value;
                     }
 
                     void clearNode(){
@@ -36,9 +35,6 @@ namespace laba2{
 
             mutable std::recursive_mutex _mtx;
 
-            //void balance();
-            //int height();
-
             Node* insertNode(Node* node, const T& value);
 
             Node* insertSubtree(Node* node, Node* subtreeRoot);
@@ -58,6 +54,8 @@ namespace laba2{
             void postorder(const Node* node, std::vector<T>& result) const;
 
             bool isEqual(const Node* node1, const Node* node2) const;
+
+            Node* getNodeWithMinimalValue(Node* node);
 
         public:
             Tree();

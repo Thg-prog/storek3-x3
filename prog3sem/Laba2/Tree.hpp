@@ -1,4 +1,5 @@
 #include "Tree.h"
+#include <iostream>
 
 namespace laba2{
 
@@ -271,33 +272,44 @@ namespace laba2{
         return *this;
     }
 
+    template<typename T>
+    typename Tree<T>::Node* Tree<T>::getNodeWithMinimalValue(Tree<T>::Node* node)
+    {
+        Node* current = node;
+        while (current->left != nullptr) {
+            current = current->left;
+        }
+        return current;
+    }
+
     template <typename T>
     typename Tree<T>::Node* Tree<T>::deleteNodeRecursive(Tree<T>::Node* node, const T& value){
-        if(node == nullptr)return nullptr;
-        if(value > node->info)return node->right = deleteNodeRecursive(node->right, value);
-        else if(value < node->info)return node->left = deleteNodeRecursive(node->left, value);
-        else if(value == node->info){
-            if(node->right == nullptr && node->left == nullptr){
-                return nullptr;
+        if (node == nullptr) return node;
+
+        if (value < node->info) {
+            node ->left = deleteNodeRecursive(node->left, value);
+        } else if (value > node->info) {
+            node->right = deleteNodeRecursive(node->right, value);
+        } else {
+            if (node->left == nullptr || node->right == nullptr) {
+                Node* temp = node->left ? node->left : node->right;
+
+                if (temp == nullptr) {
+                    temp = node;
+                    node = nullptr;
+                } else {
+                    *node = *temp;
                 }
-            else if(node->left != nullptr){
-                auto old = node;
-                node = node->left;
-                node = insertSubtree(node, old->right);
-                old->left = nullptr;
-                old->right = nullptr;
-                delete old;
-                return node;
-            }else if(node->right != nullptr){
-                auto old = node;
-                node = node->right;
-                node = insertSubtree(node, old->left);
-                old->left = nullptr;
-                old->right = nullptr;
-                delete old;
-                return node;
+
+                delete temp;
+            } else {
+                Node* temp = getNodeWithMinimalValue(node->right);
+                root->info = temp->info;
+                node->right = this->deleteNodeRecursive(node->right, temp->info);
             }
         }
+
+        return node;
     }
 
     template <typename T>
