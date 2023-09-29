@@ -8,11 +8,11 @@ class ThreadTree {
         Element* left;
         Element* right;
         T value;
-        Element() { left=NULL; right=NULL; }
+        Element() { left=nullptr; right=nullptr; }
         Element(const T& val) {
             value = val;
-            left = NULL;
-            right = NULL;
+            left = nullptr;
+            right = nullptr;
         }
     };
 
@@ -49,7 +49,7 @@ class ThreadTree {
 
 template <typename T>
 ThreadTree<T>::ThreadTree() {
-    head = NULL;
+    head = nullptr;
 }
 
 template <typename T>
@@ -61,7 +61,7 @@ ThreadTree<T>::ThreadTree(const ThreadTree<T>& tree) {
 template <typename T>
 ThreadTree<T>::ThreadTree(ThreadTree<T>&& tree) noexcept {
     moveTree(head, tree.head);
-    tree.head = NULL;
+    tree.head = nullptr;
 }
 
 template <typename T>
@@ -69,9 +69,9 @@ ThreadTree<T>::ThreadTree(std::initializer_list<T> list) {
     // for (auto value: list) {
     //     add(value);
     // }
-    head = NULL;
+    head = nullptr;
     for (const T* p = list.begin(); p != list.end(); p++) {
-        std::cout << *p << " ";
+        // std::cout << *p << " ";
         add(*p);
     }
 }
@@ -109,29 +109,29 @@ void ThreadTree<T>::add(const ThreadTree<T>& element) {
 
 template <typename T>
 void ThreadTree<T>::lkp_recursion(std::vector<T>& v, const Element* element) const {
-    if (element->left != NULL) lkp_recursion(v, element->left);
+    if (element->left != nullptr) lkp_recursion(v, element->left);
     v.push_back(element->value);
-    if (element->right != NULL) lkp_recursion(v, element->right);
+    if (element->right != nullptr) lkp_recursion(v, element->right);
 }
 
 template <typename T>
 void ThreadTree<T>::copyTree(Element*& nativeElement, const Element* otherElement) {
     nativeElement = new Element(otherElement->value);
-    if (otherElement->left != NULL) copyTree(nativeElement->left, otherElement->left);
-    if (otherElement->right != NULL) copyTree(nativeElement->right, otherElement->right);
+    if (otherElement->left != nullptr) copyTree(nativeElement->left, otherElement->left);
+    if (otherElement->right != nullptr) copyTree(nativeElement->right, otherElement->right);
 }
 
 template <typename T>
 void ThreadTree<T>::moveTree(Element*& nativeElement, Element*& otherElement) {
     nativeElement = new Element(otherElement->value);
-    if (otherElement->left != NULL) moveTree(nativeElement->left, otherElement->left);
-    if (otherElement->right != NULL) moveTree(nativeElement->right, otherElement->right);
-    otherElement = NULL;
+    if (otherElement->left != nullptr) moveTree(nativeElement->left, otherElement->left);
+    if (otherElement->right != nullptr) moveTree(nativeElement->right, otherElement->right);
+    otherElement = nullptr;
 }
 
 template <typename T>
 void ThreadTree<T>::insert(const T& val, Element*& el) {
-    if (el == NULL) {
+    if (el == nullptr) {
         el = new Element(val);
     } else if (val < el->value) {
         insert(val, el->left);
@@ -142,7 +142,7 @@ void ThreadTree<T>::insert(const T& val, Element*& el) {
 
 template <typename T>
 void ThreadTree<T>::insert(const ThreadTree& val, Element*& el) {
-    if (el == NULL) {
+    if (el == nullptr) {
         copyTree(el, val.head);
     } else if (val < el->value) {
         insert(val, el->left);
