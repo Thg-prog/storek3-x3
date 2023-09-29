@@ -1,0 +1,3 @@
+/Users/anton/Desktop/lab2Tree/cmake-build-debug/CMakeFiles/lab2Tree.dir
+/Users/anton/Desktop/lab2Tree/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/anton/Desktop/lab2Tree/cmake-build-debug/CMakeFiles/rebuild_cache.dir
