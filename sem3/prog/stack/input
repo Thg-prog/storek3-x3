@@ -1,0 +1,34 @@
+In file included from main.cpp:1:
+stack.cpp:15:1: ошибка: декларация «Stack<T>::Stack(const Stack<T>&)» имеет другой спецификатор исключений
+   15 | Stack<T>::Stack( const Stack<T>& other ) : n( other.n ) noexcept {//?
+      | ^~~~~~~~
+In file included from stack.cpp:3:
+stack.h:13:9: замечание: из предыдущей декларации «Stack<T>::Stack(const Stack<T>&) noexcept»
+   13 |         Stack( const Stack& other ) noexcept;
+      |         ^~~~~
+stack.cpp: In copy constructor «Stack<T>::Stack(const Stack<T>&)»:
+stack.cpp:15:57: ошибка: expected «{» before «noexcept»
+   15 | Stack<T>::Stack( const Stack<T>& other ) : n( other.n ) noexcept {//?
+      |                                                         ^~~~~~~~
+stack.cpp: На глобальном уровне:
+stack.cpp:15:57: ошибка: expected unqualified-id before «noexcept»
+stack.cpp:111:4: ошибка: no declaration matches «T* Stack<T>::begin() const»
+  111 | T* Stack<T>::begin() const { return arr; }
+      |    ^~~~~~~~
+stack.cpp:111:4: замечание: no functions named «T* Stack<T>::begin() const»
+stack.h:3:7: замечание: «class Stack<T>» defined here
+    3 | class Stack {
+      |       ^~~~~
+stack.cpp:114:4: ошибка: no declaration matches «T* Stack<T>::end() const»
+  114 | T* Stack<T>::end() const { return arr + n; }
+      |    ^~~~~~~~
+stack.cpp:114:4: замечание: no functions named «T* Stack<T>::end() const»
+stack.h:3:7: замечание: «class Stack<T>» defined here
+    3 | class Stack {
+      |       ^~~~~
+stack.cpp:117:11: ошибка: декларация «Stack<T>& Stack<T>::operator=(const Stack<T>&) noexcept» имеет другой спецификатор исключений
+  117 | Stack<T>& Stack<T>::operator= ( const Stack<T>& other ) noexcept {
+      |           ^~~~~~~~
+stack.h:35:16: замечание: из предыдущей декларации «Stack<T>& Stack<T>::operator=(const Stack<T>&)»
+   35 |         Stack& operator= ( const Stack& other ) ;
+      |                ^~~~~~~~
