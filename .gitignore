@@ -42,6 +42,7 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+/binary_tree/build
 
 # Local History for Visual Studio Code
 .history/
