@@ -7,20 +7,6 @@
 /dataSources/
 /dataSources.local.xml
 
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-
-#C++
-
 # Prerequisites
 *.d
 
@@ -53,3 +39,15 @@ _deps
 *.exe
 *.out
 *.app
+
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
