@@ -117,5 +117,6 @@
     "iomanip": "cpp",
     "iostream": "cpp",
     "variant": "cpp"
-  }
+  },
+  "C_Cpp_Runner.msvcSecureNoWarnings": false
 }
