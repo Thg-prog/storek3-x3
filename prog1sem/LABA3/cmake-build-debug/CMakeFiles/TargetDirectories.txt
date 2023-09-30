@@ -1,3 +1,0 @@
-E:/LABA3/cmake-build-debug/CMakeFiles/LABA3.dir
-E:/LABA3/cmake-build-debug/CMakeFiles/edit_cache.dir
-E:/LABA3/cmake-build-debug/CMakeFiles/rebuild_cache.dir
