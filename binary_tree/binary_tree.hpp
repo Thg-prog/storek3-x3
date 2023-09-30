@@ -33,7 +33,7 @@ class ThreadTree {
     Element* findTreeEl(const T& val, const Element* element) const;
     void removeElement(const T& value, Element*& element);
     Element* findMin(Element*& element) const;
-    bool checkEqualEl(const Element* nativeElement, const Element* otherElement);
+    bool checkEqualEl(const Element* nativeElement, const Element* otherElement) const;
 
     public:
     ThreadTree();
@@ -57,11 +57,13 @@ class ThreadTree {
     bool find(const T& val) const noexcept;
     ThreadTree findTree(const T& value) const noexcept;
     template <typename N> 
-    friend std::ostream& operator<<(std::ostream& out, const ThreadTree<N>& stack) noexcept; 
+    friend std::ostream& operator<<(std::ostream& out, const ThreadTree<N>& tree) noexcept; 
     void remove(const T& value);
     void clear();
-    bool operator==(const ThreadTree& tree) const noexcept; // mutex1, mutex2
-    // bool operator!=(const Stack& stack) const noexcept;
+    template <typename N>
+    friend bool operator==(const ThreadTree<N>& tree1, const ThreadTree<N>& tree2) noexcept;
+    template <typename N>
+    friend bool operator!=(const ThreadTree<N>& tree1, const ThreadTree<N>& tree2) noexcept;
 };
 
 template <typename T>
@@ -70,13 +72,13 @@ ThreadTree<T>::ThreadTree() {
 }
 
 template <typename T>
-ThreadTree<T>::ThreadTree(const ThreadTree<T>& tree) {
+ThreadTree<T>::ThreadTree(const ThreadTree& tree) {
     std::lock_guard<std::mutex> lock(tree.mutex);
     copyTree(head, tree.head);
 }
 
 template <typename T>
-ThreadTree<T>::ThreadTree(ThreadTree<T>&& tree) noexcept {
+ThreadTree<T>::ThreadTree(ThreadTree&& tree) noexcept {
     std::lock_guard<std::mutex> lock(tree.mutex);
     moveTree(head, tree.head);
     tree.head = nullptr;
@@ -159,7 +161,7 @@ void ThreadTree<T>::add(const T& element) {
 }
 
 template <typename T>
-void ThreadTree<T>::add(const ThreadTree<T>& element) {
+void ThreadTree<T>::add(const ThreadTree& element) {
     std::lock_guard<std::mutex> lock(mutex);
     insert(element, head);
 }
@@ -170,7 +172,7 @@ ThreadTree<T>& ThreadTree<T>::operator<<(const T& element) {
 }
 
 template <typename T>
-ThreadTree<T>& ThreadTree<T>::operator<<(const ThreadTree<T>& element) {
+ThreadTree<T>& ThreadTree<T>::operator<<(const ThreadTree& element) {
     add(element);
 }
 
@@ -211,14 +213,20 @@ void ThreadTree<T>::clear() {
 }
 
 template <typename T>
-bool ThreadTree<T>::operator==(const ThreadTree<T>& tree) const noexcept {
-    std::lock_guard<std::mutex> lock1(mutex);
-    std::lock_guard<std::mutex> lock2(tree.mutex);
-    return checkEqualEl(head, tree.head);
+bool operator==(const ThreadTree<T>& tree1, const ThreadTree<T>& tree2) noexcept {
+    std::lock_guard<std::mutex> lock1(tree1.mutex);
+    std::lock_guard<std::mutex> lock2(tree2.mutex);
+    return tree1.checkEqualEl(tree1.head, tree2.head);
+}
+
+template <typename T>
+bool operator!=(const ThreadTree<T>& tree1, const ThreadTree<T>& tree2) noexcept {
+    return !(tree1 == tree2);
 }
 
 template <typename T>
 void ThreadTree<T>::lkp_recursion(std::vector<T>& v, const Element* element) const {
+    if (element == nullptr) return;
     if (element->left != nullptr) lkp_recursion(v, element->left);
     v.push_back(element->value);
     if (element->right != nullptr) lkp_recursion(v, element->right);
@@ -226,6 +234,7 @@ void ThreadTree<T>::lkp_recursion(std::vector<T>& v, const Element* element) con
 
 template <typename T>
 void ThreadTree<T>::pkl_recursion(std::vector<T>& v, const Element* element) const {
+    if (element == nullptr) return;
     if (element->right != nullptr) pkl_recursion(v, element->right);
     v.push_back(element->value);
     if (element->left != nullptr) pkl_recursion(v, element->left);
@@ -233,6 +242,7 @@ void ThreadTree<T>::pkl_recursion(std::vector<T>& v, const Element* element) con
 
 template <typename T>
 void ThreadTree<T>::klp_recursion(std::vector<T>& v, const Element* element) const {
+    if (element == nullptr) return;
     v.push_back(element->value);
     if (element->left != nullptr) klp_recursion(v, element->left);
     if (element->right != nullptr) klp_recursion(v, element->right);
@@ -240,6 +250,7 @@ void ThreadTree<T>::klp_recursion(std::vector<T>& v, const Element* element) con
 
 template <typename T>
 void ThreadTree<T>::kpl_recursion(std::vector<T>& v, const Element* element) const {
+    if (element == nullptr) return;
     v.push_back(element->value);
     if (element->right != nullptr) kpl_recursion(v, element->right);
     if (element->left != nullptr) kpl_recursion(v, element->left);
@@ -247,6 +258,7 @@ void ThreadTree<T>::kpl_recursion(std::vector<T>& v, const Element* element) con
 
 template <typename T>
 void ThreadTree<T>::lpk_recursion(std::vector<T>& v, const Element* element) const {
+    if (element == nullptr) return;
     if (element->left != nullptr) lpk_recursion(v, element->left);
     if (element->right != nullptr) lpk_recursion(v, element->right);
     v.push_back(element->value);
@@ -254,6 +266,7 @@ void ThreadTree<T>::lpk_recursion(std::vector<T>& v, const Element* element) con
 
 template <typename T>
 void ThreadTree<T>::plk_recursion(std::vector<T>& v, const Element* element) const {
+    if (element == nullptr) return;
     if (element->right != nullptr) plk_recursion(v, element->right);
     if (element->left != nullptr) plk_recursion(v, element->left);
     v.push_back(element->value);
@@ -376,7 +389,7 @@ typename ThreadTree<T>::Element* ThreadTree<T>::findMin(Element*& element) const
 }
 
 template <typename T>
-bool ThreadTree<T>::checkEqualEl(const Element* nativeElement, const Element* otherElement) {
+bool ThreadTree<T>::checkEqualEl(const Element* nativeElement, const Element* otherElement) const {
     if (nativeElement == nullptr && otherElement == nullptr) {
         return true;
     } else if (nativeElement->value == otherElement->value) {
