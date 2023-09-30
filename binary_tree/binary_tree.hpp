@@ -17,20 +17,25 @@ class ThreadTree {
     Element* head;
     mutable std::mutex mutex;
 
+    // приватные обходы 
     void lkp_recursion(std::vector<T>& v, const Element* element) const;
     void pkl_recursion(std::vector<T>& v, const Element* element) const;
     void klp_recursion(std::vector<T>& v, const Element* element) const;
     void kpl_recursion(std::vector<T>& v, const Element* element) const;
     void lpk_recursion(std::vector<T>& v, const Element* element) const;
     void plk_recursion(std::vector<T>& v, const Element* element) const;
+
     void copyTree(Element*& nativeElement, const Element* otherElement);
     void moveTree(Element*& nativeElement, Element*& otherElement);
     void insert(const T& val, Element*& el);
-    void insert(const ThreadTree& val, Element*& el);
+    void insert(Element*& subtreeElement, Element*& el);
+
+    // для деструктора
     void deleteEl(Element*& element);
+
     void clearEl(Element*& element);
     bool findEl(const T& val, const Element* element) const;
-    Element* findTreeEl(const T& val, const Element* element) const;
+    const Element* findTreeEl(const T& val, const Element* element) const;
     void removeElement(const T& value, Element*& element);
     Element* findMin(Element*& element) const;
     bool checkEqualEl(const Element* nativeElement, const Element* otherElement) const;
@@ -44,22 +49,30 @@ class ThreadTree {
     ThreadTree(Iterator begin, Iterator end);
     ~ThreadTree();
 
+    // обходы
     std::vector<T> lkp() const noexcept;
     std::vector<T> pkl() const noexcept;
     std::vector<T> klp() const noexcept;
     std::vector<T> kpl() const noexcept;
     std::vector<T> lpk() const noexcept;
     std::vector<T> plk() const noexcept;
+
+    // добавления
     void add(const T& element);
     void add(const ThreadTree& element);
     ThreadTree& operator<<(const T& element);
     ThreadTree& operator<<(const ThreadTree& element);
+
+    // поиск
     bool find(const T& val) const noexcept;
     ThreadTree findTree(const T& value) const noexcept;
+
     template <typename N> 
-    friend std::ostream& operator<<(std::ostream& out, const ThreadTree<N>& tree) noexcept; 
+    friend std::ostream& operator<<(std::ostream& out, const ThreadTree<N>& tree) noexcept;
+
     void remove(const T& value);
     void clear();
+
     template <typename N>
     friend bool operator==(const ThreadTree<N>& tree1, const ThreadTree<N>& tree2) noexcept;
     template <typename N>
@@ -163,17 +176,20 @@ void ThreadTree<T>::add(const T& element) {
 template <typename T>
 void ThreadTree<T>::add(const ThreadTree& element) {
     std::lock_guard<std::mutex> lock(mutex);
-    insert(element, head);
+    ThreadTree<T> tree(element);
+    insert(tree.head, head);
 }
 
 template <typename T>
 ThreadTree<T>& ThreadTree<T>::operator<<(const T& element) {
     add(element);
+    return *this;
 }
 
 template <typename T>
 ThreadTree<T>& ThreadTree<T>::operator<<(const ThreadTree& element) {
     add(element);
+    return *this;
 }
 
 template <typename T>
@@ -186,7 +202,8 @@ template <typename T>
 ThreadTree<T> ThreadTree<T>::findTree(const T& value) const noexcept {
     std::lock_guard<std::mutex> lock(mutex);
     ThreadTree<T> subtree;
-    copyTree(subtree.head, findTreeEl(value, head));
+    const Element* el = findTreeEl(value, head);
+    subtree.copyTree(subtree.head, el);
     return subtree;
 }
 
@@ -299,14 +316,11 @@ void ThreadTree<T>::insert(const T& val, Element*& el) {
 }
 
 template <typename T>
-void ThreadTree<T>::insert(const ThreadTree& val, Element*& el) {
-    if (el == nullptr) {
-        copyTree(el, val.head);
-    } else if (val < el->value) {
-        insert(val, el->left);
-    } else {
-        insert(val, el->right);
-    }
+void ThreadTree<T>::insert(Element*& treeElement, Element*& el) {
+    if (treeElement == nullptr || el == nullptr) return;
+    insert(treeElement->value, el);
+    insert(treeElement->left, el);
+    insert(treeElement->right, el);
 }
 
 template <typename T>
@@ -329,7 +343,7 @@ void ThreadTree<T>::clearEl(Element*& element) {
 
 template <typename T>
 bool ThreadTree<T>::findEl(const T& val, const Element* el) const {
-    if (el != NULL) {
+    if (el != nullptr) {
         bool b1 = findEl(val, el->left);
         bool b2 = findEl(val, el->right);
         return el->value == val || b1 || b2;
@@ -338,16 +352,16 @@ bool ThreadTree<T>::findEl(const T& val, const Element* el) const {
 }
 
 template <typename T>
-typename ThreadTree<T>::Element* ThreadTree<T>::findTreeEl(const T& val, const Element* el) const {
+const typename ThreadTree<T>::Element* ThreadTree<T>::findTreeEl(const T& val, const Element* el) const {
     if (el == nullptr) {
         return nullptr;
     }
     if (val == el->value) {
         return el;
     } else if (val < el->value) {
-        return findTreeEl(el->left, val);
+        return findTreeEl(val, el->left);
     } else {
-        return findTreeEl(el->right, val);
+        return findTreeEl(val, el->right);
     }
 }
 
@@ -392,6 +406,8 @@ template <typename T>
 bool ThreadTree<T>::checkEqualEl(const Element* nativeElement, const Element* otherElement) const {
     if (nativeElement == nullptr && otherElement == nullptr) {
         return true;
+    } else if (!(nativeElement != nullptr) != !(otherElement != nullptr)) {
+        return false;
     } else if (nativeElement->value == otherElement->value) {
         return (nativeElement->value == otherElement->value) && checkEqualEl(nativeElement->left, otherElement->left) &&
                checkEqualEl(nativeElement->right, otherElement->right);
