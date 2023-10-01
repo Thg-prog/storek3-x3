@@ -5,14 +5,13 @@
 
 
 static void BM_ThreadsafeBinaryTreeInsert(benchmark::State& state) {
-  ThreadTree<int> tree;
-  for (auto _ : state) {
-    for (int i = 0; i < state.iterations(); ++i) {
-      tree.add(i);
+    ThreadTree<int> tree;
+    for (auto _ : state) {
+        for (int i = 0; i < state.iterations(); ++i) {
+            tree.add(i);
+        }
     }
-  }
 }
-BENCHMARK(BM_ThreadsafeBinaryTreeInsert)->Iterations(1000000);
 
 static void BM_ThreadsafeBinaryTreeFind(benchmark::State& state) {
     ThreadTree<int> tree;
@@ -33,6 +32,8 @@ static void BM_ThreadsafeBinaryTreeFind(benchmark::State& state) {
         thread.join();
     }
 }
+
+BENCHMARK(BM_ThreadsafeBinaryTreeInsert)->Iterations(1000000);
 BENCHMARK(BM_ThreadsafeBinaryTreeFind)->Iterations(10000)->Threads(4);
 
 BENCHMARK_MAIN();

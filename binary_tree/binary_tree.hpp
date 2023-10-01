@@ -79,6 +79,8 @@ class ThreadTree {
     friend bool operator!=(const ThreadTree<N>& tree1, const ThreadTree<N>& tree2) noexcept;
 };
 
+// публичные методы
+
 template <typename T>
 ThreadTree<T>::ThreadTree() {
     head = nullptr;
@@ -240,6 +242,10 @@ template <typename T>
 bool operator!=(const ThreadTree<T>& tree1, const ThreadTree<T>& tree2) noexcept {
     return !(tree1 == tree2);
 }
+
+
+// приватные методы
+
 
 template <typename T>
 void ThreadTree<T>::lkp_recursion(std::vector<T>& v, const Element* element) const {
