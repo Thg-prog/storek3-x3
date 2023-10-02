@@ -1,3 +1,3 @@
-/Users/anton/Desktop/lab1Stack/cmake-build-debug/CMakeFiles/lab1Stack.dir
-/Users/anton/Desktop/lab1Stack/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/anton/Desktop/lab1Stack/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/anton/Documents/storek3-x3/programming sem3/lab1Stack/cmake-build-debug/CMakeFiles/lab1Stack.dir
+/Users/anton/Documents/storek3-x3/programming sem3/lab1Stack/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/anton/Documents/storek3-x3/programming sem3/lab1Stack/cmake-build-debug/CMakeFiles/rebuild_cache.dir

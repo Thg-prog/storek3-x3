@@ -30,6 +30,8 @@ public:
     ThreadSafeBST(std::initializer_list<T> initList);
     template <typename InputIterator>
     ThreadSafeBST(InputIterator begin, InputIterator end);
+    ThreadSafeBST& operator=(const ThreadSafeBST& tree);
+    ThreadSafeBST& operator=(ThreadSafeBST&& tree)noexcept;
 
     // Деструктор
     ~ThreadSafeBST();
@@ -55,8 +57,8 @@ public:
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const ThreadSafeBST<U>& tree);
     // Операторы сравнения
-    bool operator==(const ThreadSafeBST& other) const ;
-    bool operator!=(const ThreadSafeBST& other) const;
+    bool operator==(const ThreadSafeBST& other) const noexcept;
+    bool operator!=(const ThreadSafeBST& other) const noexcept;
 
     ThreadSafeBST& operator<<(ThreadSafeBST& tree);
     ThreadSafeBST& operator<<(T& value);
@@ -85,6 +87,40 @@ private:
 
     bool isEqual(const Node* node1, const Node* node2) const;
 };
+
+template<typename T>
+ThreadSafeBST<T> &ThreadSafeBST<T>::operator=(ThreadSafeBST<T> &&tree) noexcept{
+    std::lock_guard<std::recursive_mutex> lock1(tree.m_mtx);
+    std::lock_guard<std::mutex> lock2(m_mtx);
+    if(this != *tree){
+        if(m_root != nullptr){
+            m_root->clearNode();
+            m_root = nullptr;
+        }
+        if(tree.m_root != nullptr){
+            m_root = new Node(tree.root->info);
+            m_root = cloneNode(tree.m_root);
+            tree.root->clearNode();
+            delete m_root;
+        }
+    }
+    return *this;
+}
+
+template<typename T>
+ThreadSafeBST<T> &ThreadSafeBST<T>::operator=(const ThreadSafeBST<T> &tree) {
+    std::lock_guard<std::recursive_mutex> lock1(tree.m_mtx);
+    std::lock_guard<std::mutex> lock2(m_mtx);
+    if(this != *tree){
+        if(m_root != nullptr){
+            m_root->clearNode();
+            delete m_root;
+        }
+        m_root = new Node(tree.m_root->info);
+        m_root = cloneNode(tree.m_root);
+    }
+    return *this;
+}
 
 ///приватные методы
 template<typename T>
@@ -224,14 +260,14 @@ bool ThreadSafeBST<T>::isEqual(const ThreadSafeBST::Node *node1, const ThreadSaf
 
 /// публичные методы класса
 template<typename T>
-bool ThreadSafeBST<T>::operator==(const ThreadSafeBST &other) const {
+bool ThreadSafeBST<T>::operator==(const ThreadSafeBST &other) const noexcept{
     std::lock_guard<std::mutex> lock1(m_mtx);
     std::lock_guard<std::mutex> lock2(other.m_mtx);
     return isEqual(m_root.get(), other.m_root.get());
 }
 
 template<typename T>
-bool ThreadSafeBST<T>::operator!=(const ThreadSafeBST &other) const {
+bool ThreadSafeBST<T>::operator!=(const ThreadSafeBST &other) const noexcept{
     return !(*this == other);
 }
 

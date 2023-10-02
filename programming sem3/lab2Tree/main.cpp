@@ -65,6 +65,44 @@ static void BM_Find(benchmark::State& state) {
 }
 BENCHMARK(BM_Find);
 
+class TestClass{
+private:
+    int cur;
+public:
+    TestClass(int value){
+        cur = value;
+    }
+
+    int getValue(){
+        return cur;
+    }
+
+    friend bool operator<(const TestClass& left, const TestClass& right){
+        return left.cur < right.cur;
+    }
+    friend bool operator>(const TestClass& left, const TestClass& right){
+        return left.cur > right.cur;
+    }
+
+    friend bool operator<=(const TestClass& left, const TestClass& right){
+        return left.cur <= right.cur;
+    }
+
+    friend bool operator==(const TestClass& left, const TestClass& right){
+        return left.cur == right.cur;
+    }
+    friend bool operator!=(const TestClass& left, const TestClass& right){
+        return left.cur != right.cur;
+    }
+};
+
+TEST(TreeTest, ClassTest){
+    ThreadSafeBST<TestClass> tree{TestClass(1), TestClass(10), TestClass(0)};
+    std::vector<TestClass> vec1;
+    tree.inorderTraversal(vec1);
+    EXPECT_EQ(vec1.at(0).getValue(), 0);
+}
+
 
 int main(int argc, char**argv) {
     ThreadSafeBST<int> tree;
@@ -82,6 +120,23 @@ int main(int argc, char**argv) {
     for (const int& value : postorderResult) {
         std::cout << value << " ";
     }
+    std::cout<<std::endl;
+    ThreadSafeBST<double> tree1;
+    tree1.insert(5.6);
+    tree1.insert(3.6);
+    tree1.insert(7.6);
+    tree1.insert(2.6);
+    tree1.insert(4.6);
+    tree1.insert(6.6);
+    tree1.insert(8.6);
+
+    std::vector<double> postorderResult1;
+    tree1.postorderTraversal(postorderResult1);
+
+    for (const double& value : postorderResult1) {
+        std::cout << value << " ";
+    }
+    std::cout<<std::endl;
     testing::InitGoogleTest(&argc,argv);
 // Вывод: 2 4 3 6 8 7 5
     ::benchmark::Initialize(&argc,argv);
