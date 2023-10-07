@@ -46,13 +46,13 @@ public:
     // Добавление поддерева
     void add(const ThreadSafeBST& subtree) ;
     // Поиск элемента
-    bool find(const T& value) const;
+    bool find(const T& value) const noexcept;
     // Вернуть поддерево
     ThreadSafeBST findTree(const T& value) const;
     // Удаление элемента
     void remove(const T& value) ;
     // Очистка дерева
-    void clear();
+    void clear() noexcept;
     // Перегрузка оператора <<
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const ThreadSafeBST<U>& tree);
@@ -92,7 +92,7 @@ template<typename T>
 ThreadSafeBST<T> &ThreadSafeBST<T>::operator=(ThreadSafeBST<T> &&tree) noexcept{
     std::lock_guard<std::recursive_mutex> lock1(tree.m_mtx);
     std::lock_guard<std::mutex> lock2(m_mtx);
-    if(this != *tree){
+    if(this != &tree){
         if(m_root != nullptr){
             m_root->clearNode();
             m_root = nullptr;
@@ -336,7 +336,7 @@ void ThreadSafeBST<T>::add(const ThreadSafeBST &subtree) {
 }
 
 template<typename T>
-bool ThreadSafeBST<T>::find(const T &value) const {
+bool ThreadSafeBST<T>::find(const T &value) const noexcept {
     std::lock_guard<std::mutex> lock(m_mtx);
     return find(m_root.get(), value);
 }
@@ -359,7 +359,7 @@ void ThreadSafeBST<T>::remove(const T &value) {
 }
 
 template<typename T>
-void ThreadSafeBST<T>::clear() {
+void ThreadSafeBST<T>::clear() noexcept {
     std::lock_guard<std::mutex> lock(m_mtx);
     clear(m_root);
 }
