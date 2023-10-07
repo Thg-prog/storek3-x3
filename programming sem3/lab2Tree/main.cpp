@@ -145,9 +145,10 @@ int main(int argc, char**argv) {
 
 
     ThreadSafeBST<int> tree({10,4,45,2,7,12,56});
-    const ThreadSafeBST<int> tree2 =std::move(tree);
+    ThreadSafeBST<int> tree2 =std::move(tree);
     //std::cout<<tree2;
-    tree2.remove(10);//
+
+    tree2.remove(10);
     std::cout << tree2;
 //    testing::InitGoogleTest(&argc,argv);
 //    return RUN_ALL_TESTS();
