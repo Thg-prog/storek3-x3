@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	_ "strings"
+
+	"github.com/pmezard/go-difflib/difflib"
 )
 
 func main() {
@@ -38,6 +41,7 @@ func main() {
 	// Считываем строки из второго файла и выводим их в указанном формате
 	addedStrings := make([]string, 0)
 	deletedStrings := make([]string, 0)
+	modifiedStrings := make([]string, 0)
 
 	fmt.Println("0a1,", lineNumber-1)
 
@@ -48,6 +52,19 @@ func main() {
 			addedStrings = append(addedStrings, fmt.Sprintf(">%s\n", line))
 		}
 		delete(linesMap, line)
+
+		// Сравниваем строки с помощью difflib
+		diff := difflib.UnifiedDiff{
+			A:        difflib.SplitLines(line),
+			B:        difflib.SplitLines(line),
+			FromFile: "File1",
+			ToFile:   "File2",
+			Context:  0,
+		}
+		textDiff, _ := difflib.GetUnifiedDiffString(diff)
+		if textDiff != "" {
+			modifiedStrings = append(modifiedStrings, textDiff)
+		}
 	}
 
 	for deletedLine, lineNum := range linesMap {
@@ -55,6 +72,10 @@ func main() {
 	}
 
 	for _, str := range addedStrings {
+		fmt.Print(str)
+	}
+
+	for _, str := range modifiedStrings {
 		fmt.Print(str)
 	}
 
