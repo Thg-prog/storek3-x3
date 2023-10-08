@@ -36,20 +36,29 @@ func main() {
 	}
 
 	// Считываем строки из второго файла и выводим их в указанном формате
-	addStrings := make([]string, 0)
+	addedStrings := make([]string, 0)
+	deletedStrings := make([]string, 0)
+
 	fmt.Println("0a1,", lineNumber-1)
 
 	scanner2 := bufio.NewScanner(file2)
 	for scanner2.Scan() {
 		line := scanner2.Text()
 		if _, exists := linesMap[line]; !exists {
-			addStrings = append(addStrings, fmt.Sprintf(">%s\n", line))
-
-			//prevLineNum = lineNum
+			addedStrings = append(addedStrings, fmt.Sprintf(">%s\n", line))
 		}
+		delete(linesMap, line)
 	}
 
-	for _, str := range addStrings {
+	for deletedLine, lineNum := range linesMap {
+		deletedStrings = append(deletedStrings, fmt.Sprintf("<%s в строке %d\n", deletedLine, lineNum))
+	}
+
+	for _, str := range addedStrings {
+		fmt.Print(str)
+	}
+
+	for _, str := range deletedStrings {
 		fmt.Print(str)
 	}
 
