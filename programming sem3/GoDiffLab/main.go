@@ -2,92 +2,103 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
-	_ "strings"
+	"strings"
 
 	"github.com/pmezard/go-difflib/difflib"
 )
 
 func main() {
-	// Открываем первый файл для чтения
-	file1, err := os.Open("1.txt")
-	if err != nil {
-		fmt.Println("Ошибка при открытии файла 1:", err)
+	ignoreWhitespace := flag.Bool("b", false, "Игнорировать пробельные символы")
+	ignoreCase := flag.Bool("i", false, "Игнорировать регистр букв")
+	flag.Parse()
+
+	args := flag.Args()
+	if len(args) != 2 {
+		fmt.Println("Использование: main.go [-b] [-i] original.txt new.txt")
 		return
 	}
-	defer file1.Close()
 
-	// Открываем второй файл для чтения
-	file2, err := os.Open("2.txt")
+	originalFileName := args[0]
+	newFileName := args[1]
+
+	originalLines, err := readLines(originalFileName)
 	if err != nil {
-		fmt.Println("Ошибка при открытии файла 2:", err)
+		fmt.Println("Ошибка при чтении файла original.txt:", err)
 		return
 	}
-	defer file2.Close()
 
-	// Создаем map для хранения строк из первого файла и их номеров
-	linesMap := make(map[string]int)
-
-	// Считываем строки из первого файла и добавляем их в map
-	scanner1 := bufio.NewScanner(file1)
-	lineNumber := 1
-	for scanner1.Scan() {
-		line := scanner1.Text()
-		linesMap[line] = lineNumber
-		lineNumber++
+	newLines, err := readLines(newFileName)
+	if err != nil {
+		fmt.Println("Ошибка при чтении файла new.txt:", err)
+		return
 	}
 
-	// Считываем строки из второго файла и выводим их в указанном формате
-	addedStrings := make([]string, 0)
-	deletedStrings := make([]string, 0)
-	modifiedStrings := make([]string, 0)
+	diffs := diffText(originalLines, newLines, *ignoreWhitespace, *ignoreCase)
 
-	fmt.Println("0a1,", lineNumber-1)
+	for _, diff := range diffs {
+		fmt.Println(diff)
+	}
+}
 
-	scanner2 := bufio.NewScanner(file2)
-	for scanner2.Scan() {
-		line := scanner2.Text()
-		if _, exists := linesMap[line]; !exists {
-			addedStrings = append(addedStrings, fmt.Sprintf(">%s\n", line))
+func readLines(fileName string) ([]string, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
+
+func diffText(original, new []string, ignoreWhitespace, ignoreCase bool) []string {
+	if ignoreWhitespace {
+		original = removeWhitespace(original)
+		new = removeWhitespace(new)
+	}
+
+	if ignoreCase {
+		original = toLowercase(original)
+		new = toLowercase(new)
+	}
+
+	diff := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(strings.Join(original, "\n")),
+		B:        difflib.SplitLines(strings.Join(new, "\n")),
+		Context:  1,
+		FromFile: "original.txt",
+		FromDate: "",
+		ToFile:   "new.txt",
+		ToDate:   "",
+	}
+
+	text, _ := difflib.GetUnifiedDiffString(diff)
+
+	return strings.Split(text, "\n")
+}
+
+func removeWhitespace(lines []string) []string {
+	var result []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			result = append(result, line)
 		}
-		delete(linesMap, line)
-
-		// Сравниваем строки с помощью difflib
-		diff := difflib.UnifiedDiff{
-			A:        difflib.SplitLines(line),
-			B:        difflib.SplitLines(line),
-			FromFile: "File1",
-			ToFile:   "File2",
-			Context:  0,
-		}
-		textDiff, _ := difflib.GetUnifiedDiffString(diff)
-		if textDiff != "" {
-			modifiedStrings = append(modifiedStrings, textDiff)
-		}
 	}
+	return result
+}
 
-	for deletedLine, lineNum := range linesMap {
-		deletedStrings = append(deletedStrings, fmt.Sprintf("<%s в строке %d\n", deletedLine, lineNum))
+func toLowercase(lines []string) []string {
+	var result []string
+	for _, line := range lines {
+		result = append(result, strings.ToLower(line))
 	}
-
-	for _, str := range addedStrings {
-		fmt.Print(str)
-	}
-
-	for _, str := range modifiedStrings {
-		fmt.Print(str)
-	}
-
-	for _, str := range deletedStrings {
-		fmt.Print(str)
-	}
-
-	if err := scanner1.Err(); err != nil {
-		fmt.Println("Ошибка при чтении файла 1:", err)
-	}
-
-	if err := scanner2.Err(); err != nil {
-		fmt.Println("Ошибка при чтении файла 2:", err)
-	}
+	return result
 }
