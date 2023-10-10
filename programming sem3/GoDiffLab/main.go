@@ -1,104 +1,83 @@
 package main
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
-
-	"github.com/pmezard/go-difflib/difflib"
 )
 
 func main() {
-	ignoreWhitespace := flag.Bool("b", false, "Игнорировать пробельные символы")
-	ignoreCase := flag.Bool("i", false, "Игнорировать регистр букв")
-	flag.Parse()
-
-	args := flag.Args()
-	if len(args) != 2 {
-		fmt.Println("Использование: main.go [-b] [-i] original.txt new.txt")
+	file1, err1 := ioutil.ReadFile("1.txt")
+	if err1 != nil {
+		fmt.Println("Ошибка при чтении файла 1.txt:", err1)
 		return
 	}
 
-	originalFileName := args[0]
-	newFileName := args[1]
-
-	originalLines, err := readLines(originalFileName)
-	if err != nil {
-		fmt.Println("Ошибка при чтении файла original.txt:", err)
+	file2, err2 := ioutil.ReadFile("2.txt")
+	if err2 != nil {
+		fmt.Println("Ошибка при чтении файла 2.txt:", err2)
 		return
 	}
 
-	newLines, err := readLines(newFileName)
-	if err != nil {
-		fmt.Println("Ошибка при чтении файла new.txt:", err)
-		return
-	}
+	lines1 := strings.Split(string(file1), "\n")
+	lines2 := strings.Split(string(file2), "\n")
 
-	diffs := diffText(originalLines, newLines, *ignoreWhitespace, *ignoreCase)
+	result := make([]string, 0)
 
-	for _, diff := range diffs {
-		fmt.Println(diff)
-	}
-}
+	i, j := 0, 0
 
-func readLines(fileName string) ([]string, error) {
-	file, err := os.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
+	for i < len(lines1) && j < len(lines2) {
+		if lines1[i] == lines2[j] {
+			result = append(result, "  "+lines1[i])
+			i++
+			j++
+		} else {
+			foundDiff := false
+			for x := i + 1; x < len(lines1); x++ {
+				if lines1[x] == lines2[j] {
+					for y := i; y < x; y++ {
+						result = append(result, "< "+lines1[y])
+					}
+					i = x
+					foundDiff = true
+					break
+				}
+			}
 
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
+			if !foundDiff {
+				for x := j + 1; x < len(lines2); x++ {
+					if lines2[x] == lines1[i] {
+						for y := j; y < x; y++ {
+							result = append(result, "> "+lines2[y])
+						}
+						j = x
+						foundDiff = true
+						break
+					}
+				}
+			}
 
-func diffText(original, new []string, ignoreWhitespace, ignoreCase bool) []string {
-	if ignoreWhitespace {
-		original = removeWhitespace(original)
-		new = removeWhitespace(new)
-	}
-
-	if ignoreCase {
-		original = toLowercase(original)
-		new = toLowercase(new)
-	}
-
-	diff := difflib.UnifiedDiff{
-		A:        difflib.SplitLines(strings.Join(original, "\n")),
-		B:        difflib.SplitLines(strings.Join(new, "\n")),
-		Context:  1,
-		FromFile: "original.txt",
-		FromDate: "",
-		ToFile:   "new.txt",
-		ToDate:   "",
-	}
-
-	text, _ := difflib.GetUnifiedDiffString(diff)
-
-	return strings.Split(text, "\n")
-}
-
-func removeWhitespace(lines []string) []string {
-	var result []string
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line != "" {
-			result = append(result, line)
+			if !foundDiff {
+				result = append(result, "< "+lines1[i])
+				result = append(result, "> "+lines2[j])
+				i++
+				j++
+			}
 		}
 	}
-	return result
-}
 
-func toLowercase(lines []string) []string {
-	var result []string
-	for _, line := range lines {
-		result = append(result, strings.ToLower(line))
+	for i < len(lines1) {
+		result = append(result, "< "+lines1[i])
+		i++
 	}
-	return result
+
+	for j < len(lines2) {
+		result = append(result, "> "+lines2[j])
+		j++
+	}
+
+	fmt.Println("result")
+	for _, line := range result {
+		fmt.Println(line)
+	}
 }
