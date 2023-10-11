@@ -125,7 +125,11 @@ func main() {
 			// Добавим информацию о блоке
 			blocks = append(blocks, DifferenceBlock{StartLineNumber: differences[startIndex].Start, EndLineNumber: differences[endIndex-1].End})
 			// Выведем блок
-			fmt.Printf("%d a %d,%d\n", differences[startIndex].Start, differences[startIndex].Start, differences[endIndex-1].End)
+			if differences[startIndex].Start == 1 {
+				fmt.Printf("%d a %d,%d\n", differences[startIndex].Start-1, differences[startIndex].Start, differences[endIndex-1].End)
+			} else {
+				fmt.Printf("%d a %d,%d\n", differences[startIndex].Start, differences[startIndex].Start, differences[endIndex-1].End)
+			}
 			for j := startIndex; j < endIndex; j++ {
 				fmt.Printf("%d %s %s\n", differences[j].Start, differences[j].Type, differences[j].Text)
 			}
