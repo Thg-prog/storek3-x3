@@ -35,12 +35,18 @@ func main() {
 	lines1 := strings.Split(string(file1), "\n")
 	lines2 := strings.Split(string(file2), "\n")
 
+	differences, blocks := compareLines(lines1, lines2)
+
+	printDifferences(differences, blocks)
+}
+
+func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 	differences := make([]Difference, 0)
 	blocks := make([]DifferenceBlock, 0)
 	currentBlock := DifferenceBlock{}
+	lineNumber1, lineNumber2 := 1, 1
 
 	i, j := 0, 0
-	lineNumber1, lineNumber2 := 1, 1
 
 	for i < len(lines1) && j < len(lines2) {
 		if lines1[i] == lines2[j] {
@@ -91,7 +97,6 @@ func main() {
 		}
 	}
 
-	// Проверьте, есть ли текущий блок различий, и добавьте его в массив
 	if currentBlock.StartLineNumber > 0 {
 		blocks = append(blocks, currentBlock)
 	}
@@ -108,23 +113,23 @@ func main() {
 		lineNumber2++
 	}
 
-	// Сортировка массива различий по полю Start
 	sort.Slice(differences, func(i, j int) bool {
 		return differences[i].Start < differences[j].Start
 	})
 
+	return differences, blocks
+}
+
+func printDifferences(differences []Difference, blocks []DifferenceBlock) {
 	fmt.Println("Результат сравнения:")
 	for i := 0; i < len(differences); {
-		// Проверим, следует ли создать блок для строк с type ">"
 		if differences[i].Type == ">" {
 			startIndex := i
 			endIndex := i
 			for endIndex < len(differences) && differences[endIndex].Type == ">" {
 				endIndex++
 			}
-			// Добавим информацию о блоке
 			blocks = append(blocks, DifferenceBlock{StartLineNumber: differences[startIndex].Start, EndLineNumber: differences[endIndex-1].End})
-			// Выведем блок
 			if differences[startIndex].Start == 1 {
 				fmt.Printf("%d a %d,%d\n", differences[startIndex].Start-1, differences[startIndex].Start, differences[endIndex-1].End)
 			} else {
@@ -140,9 +145,7 @@ func main() {
 			for endIndex < len(differences) && differences[endIndex].Type == "<" {
 				endIndex++
 			}
-			// Добавим информацию о блоке
 			blocks = append(blocks, DifferenceBlock{StartLineNumber: differences[startIndex].Start, EndLineNumber: differences[endIndex-1].End})
-			// Выведем блок
 			fmt.Printf("%d d %d,%d\n", differences[startIndex].Start, differences[startIndex].Start, differences[endIndex-1].End)
 			for j := startIndex; j < endIndex; j++ {
 				fmt.Printf("%d %s %s\n", differences[j].Start, differences[j].Type, differences[j].Text)
