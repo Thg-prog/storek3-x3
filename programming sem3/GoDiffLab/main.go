@@ -83,16 +83,35 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 			}
 
 			if !foundDiff {
-				if currentBlock.StartLineNumber == 0 {
-					currentBlock.StartLineNumber = lineNumber1
+				diffCount := 0
+				for c := 0; c < len(lines1[i]) && c < len(lines2[j]); c++ {
+					if lines1[i][c] != lines2[j][c] {
+						diffCount++
+					}
 				}
-				currentBlock.EndLineNumber = lineNumber1
-				differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: lines1[i]})
-				differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: lines2[j]})
-				i++
-				j++
-				lineNumber1++
-				lineNumber2++
+				// Проверяем, не превышает ли количество различных символов половину длины строки
+				if diffCount <= len(lines1[i])/2 {
+					if currentBlock.StartLineNumber == 0 {
+						currentBlock.StartLineNumber = lineNumber1
+					}
+					currentBlock.EndLineNumber = lineNumber1
+					differences = append(differences, Difference{Type: "c", Start: lineNumber1, End: lineNumber2, Text: lines2[j]})
+					i++
+					j++
+					lineNumber1++
+					lineNumber2++
+				} else {
+					if currentBlock.StartLineNumber == 0 {
+						currentBlock.StartLineNumber = lineNumber1
+					}
+					currentBlock.EndLineNumber = lineNumber1
+					differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: lines1[i]})
+					differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: lines2[j]})
+					i++
+					j++
+					lineNumber1++
+					lineNumber2++
+				}
 			}
 		}
 	}
@@ -149,6 +168,18 @@ func printDifferences(differences []Difference, blocks []DifferenceBlock) {
 			fmt.Printf("%d d %d,%d\n", differences[startIndex].Start, differences[startIndex].Start, differences[endIndex-1].End)
 			for j := startIndex; j < endIndex; j++ {
 				fmt.Printf("%d %s %s\n", differences[j].Start, differences[j].Type, differences[j].Text)
+			}
+			i = endIndex
+		} else if differences[i].Type == "c" {
+			startIndex := i
+			endIndex := i
+			for endIndex < len(differences) && differences[endIndex].Type == "c" {
+				endIndex++
+			}
+			blocks = append(blocks, DifferenceBlock{StartLineNumber: differences[startIndex].Start, EndLineNumber: differences[endIndex-1].End})
+			fmt.Printf("%d c %d\n", differences[startIndex].Start, differences[endIndex-1].End)
+			for j := startIndex; j < endIndex; j++ {
+				fmt.Printf("%d < %s \n", differences[j].Start, differences[j].Text)
 			}
 			i = endIndex
 		} else {
