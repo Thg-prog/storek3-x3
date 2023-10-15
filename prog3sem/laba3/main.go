@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -21,6 +22,11 @@ type DiffBlock struct {
 }
 
 func main() {
+	isAlpha := flag.Bool("noregister", false, "Change register to small")
+	isSpace := flag.Bool("nospace", false, "Deletes spaces")
+
+	flag.Parse()
+
 	file1, err1 := ioutil.ReadFile("1.txt")
 	if err1 != nil {
 		fmt.Println("Ошибка при чтении файла 1.txt:", err1)
@@ -35,6 +41,26 @@ func main() {
 
 	lines1 := strings.Split(string(file1), "\n")
 	lines2 := strings.Split(string(file2), "\n")
+
+	for i, line := range lines1 {
+		if *isAlpha == true {
+			line = strings.ToLower(line)
+			fmt.Printf(line)
+		}
+		if *isSpace == true {
+			line = strings.ReplaceAll(line, " ", "")
+		}
+		lines1[i] = line
+	}
+	for i, line := range lines2 {
+		if *isAlpha == true {
+			line = strings.ToLower(line)
+		}
+		if *isSpace == true {
+			line = strings.ReplaceAll(line, " ", "")
+		}
+		lines2[i] = line
+	}
 
 	dif := compare(lines1, lines2)
 	printDifferences(outputBuilder(dif))
@@ -73,14 +99,6 @@ func compare(lines1, lines2 []string) []Diff {
 	for _, line1 := range lines1 {
 		differences = append(differences, Diff{line: line1, modify: "d"})
 	}
-
-	/*for i := 0; i < len(lines1); i++ {
-		for o := 0; o < len(lines2); o++ {
-			if lines1[i] != lines2[o] && !isDifferent(lines1[i], lines2[o]) {
-				differences = append(differences, Diff{line: lines2[o], modify: "c", linenum: i})
-			}
-		}
-	}*/
 
 	return differences
 }
@@ -188,59 +206,3 @@ func max(a, b int) int {
 	}
 	return b
 }
-
-/*func isDifferent(line1, line2 string) bool {
-	line1_len, line2_len := float64(len(line1)), float64(len(line2))
-	if math.Abs(line1_len-line2_len) > (math.Max(line1_len, line2_len) / 2) {
-		return true
-	}
-	dif := 0
-	for i := 0; i < int(math.Min(line1_len, line2_len)); i++ {
-		if line1[i] != line2[i] {
-			dif++
-		}
-	}
-	if dif > int(math.Max(line1_len, line2_len))/2 {
-		return true
-	}
-	return false
-}*/
-
-/*
-func compare(lines1, lines2 []string) []Diff {
-	i, j := 0, 0
-	differences := make([]Diff, 0)
-	for i < len(lines1) && j < len(lines2) {
-		if lines1[i] == lines2[j] {
-			i++
-			j++
-		} else {
-			for x := i + 1; x < len(lines2); x++ {
-				if lines1[i] != lines2[x] {
-					if isDifferent(lines1[i], lines2[x]) {
-						differences = append(differences, Diff{line: lines2[x], modify: "d", linenum: x})
-					} else if !isDifferent(lines1[i], lines2[x]) && lines1[i] != lines2[x] {
-						differences = append(differences, Diff{line: lines2[x], modify: "c", linenum: x})
-					}
-				}
-				break
-			}
-			i++
-			j++
-		}
-	}
-	for i := 0; i < len(lines2); i++ {
-		flag := false
-		for o := 0; o < len(lines1); o++ {
-			if isDifferent(lines2[i], lines1[o]) == true {
-
-				flag = true
-
-			}
-		}
-		if flag == true {
-			differences = append(differences, Diff{line: lines2[i], modify: "a", linenum: i})
-		}
-	}
-	return differences
-}*/
