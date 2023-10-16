@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"sort"
@@ -19,16 +20,33 @@ type DifferenceBlock struct {
 	EndLineNumber   int
 }
 
+var (
+	ignoreWhitespace bool
+	ignoreCase       bool
+)
+
 func main() {
-	file1, err1 := ioutil.ReadFile("1.txt")
+	flag.BoolVar(&ignoreWhitespace, "b", false, "Игнорировать пробельные символы")
+	flag.BoolVar(&ignoreCase, "i", false, "Игнорировать регистр букв")
+	flag.Parse()
+	ln := len(flag.Args())
+
+	if ln != 2 {
+		fmt.Println("Использование: программа файл1 файл2")
+		return
+	}
+	file1Name := flag.Arg(0)
+	file2Name := flag.Arg(1)
+
+	file1, err1 := ioutil.ReadFile(file1Name)
 	if err1 != nil {
-		fmt.Println("Ошибка при чтении файла 1.txt:", err1)
+		fmt.Printf("Ошибка при чтении файла %s: %v\n", file1Name, err1)
 		return
 	}
 
-	file2, err2 := ioutil.ReadFile("2.txt")
+	file2, err2 := ioutil.ReadFile(file2Name)
 	if err2 != nil {
-		fmt.Println("Ошибка при чтении файла 2.txt:", err2)
+		fmt.Printf("Ошибка при чтении файла %s: %v\n", file2Name, err2)
 		return
 	}
 
@@ -49,7 +67,22 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 	i, j := 0, 0
 
 	for i < len(lines1) && j < len(lines2) {
-		if lines1[i] == lines2[j] {
+		line1 := lines1[i]
+		line2 := lines2[j]
+
+		if ignoreCase {
+			line1 = strings.ToLower(line1)
+			line2 = strings.ToLower(line2)
+		}
+
+		if ignoreWhitespace {
+			line1 = strings.ReplaceAll(line1, " ", "")
+			line2 = strings.ReplaceAll(line2, " ", "")
+			line1 = strings.ReplaceAll(line1, "\t", "")
+			line2 = strings.ReplaceAll(line2, "\t", "")
+		}
+
+		if line1 == line2 {
 			i++
 			j++
 			lineNumber1++
@@ -57,7 +90,18 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 		} else {
 			foundDiff := false
 			for x := i + 1; x < len(lines1); x++ {
-				if lines1[x] == lines2[j] {
+				tempLine1 := lines1[x]
+
+				if ignoreCase {
+					tempLine1 = strings.ToLower(tempLine1)
+				}
+
+				if ignoreWhitespace {
+					tempLine1 = strings.ReplaceAll(tempLine1, " ", "")
+					tempLine1 = strings.ReplaceAll(tempLine1, "\t", "")
+				}
+
+				if tempLine1 == line2 {
 					for y := i; y < x; y++ {
 						differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: lines1[y]})
 						lineNumber1++
@@ -70,7 +114,18 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 
 			if !foundDiff {
 				for x := j + 1; x < len(lines2); x++ {
-					if lines2[x] == lines1[i] {
+					tempLine2 := lines2[x]
+
+					if ignoreCase {
+						tempLine2 = strings.ToLower(tempLine2)
+					}
+
+					if ignoreWhitespace {
+						tempLine2 = strings.ReplaceAll(tempLine2, " ", "")
+						tempLine2 = strings.ReplaceAll(tempLine2, "\t", "")
+					}
+
+					if tempLine2 == line1 {
 						for y := j; y < x; y++ {
 							differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: lines2[y]})
 							lineNumber2++
@@ -84,18 +139,19 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 
 			if !foundDiff {
 				diffCount := 0
-				for c := 0; c < len(lines1[i]) && c < len(lines2[j]); c++ {
-					if lines1[i][c] != lines2[j][c] {
+				for c := 0; c < len(line1) && c < len(line2); c++ {
+					if line1[c] != line2[c] {
 						diffCount++
 					}
 				}
 				// Проверяем, не превышает ли количество различных символов половину длины строки
-				if diffCount <= len(lines1[i])/2 {
+				if diffCount <= len(line1)/2 {
 					if currentBlock.StartLineNumber == 0 {
 						currentBlock.StartLineNumber = lineNumber1
 					}
 					currentBlock.EndLineNumber = lineNumber1
-					differences = append(differences, Difference{Type: "c", Start: lineNumber1, End: lineNumber2, Text: lines2[j]})
+					differences = append(differences, Difference{Type: "c", Start: lineNumber1, End: lineNumber2, Text: line1})
+					differences = append(differences, Difference{Type: "c", Start: lineNumber1, End: lineNumber2, Text: line2})
 					i++
 					j++
 					lineNumber1++
@@ -105,8 +161,8 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 						currentBlock.StartLineNumber = lineNumber1
 					}
 					currentBlock.EndLineNumber = lineNumber1
-					differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: lines1[i]})
-					differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: lines2[j]})
+					differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: line1})
+					differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: line2})
 					i++
 					j++
 					lineNumber1++
@@ -121,13 +177,35 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 	}
 
 	for i < len(lines1) {
-		differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: lines1[i]})
+		line1 := lines1[i]
+
+		if ignoreCase {
+			line1 = strings.ToLower(line1)
+		}
+
+		if ignoreWhitespace {
+			line1 = strings.ReplaceAll(line1, " ", "")
+			line1 = strings.ReplaceAll(line1, "\t", "")
+		}
+
+		differences = append(differences, Difference{Type: "<", Start: lineNumber1, End: lineNumber1, Text: line1})
 		i++
 		lineNumber1++
 	}
 
 	for j < len(lines2) {
-		differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: lines2[j]})
+		line2 := lines2[j]
+
+		if ignoreCase {
+			line2 = strings.ToLower(line2)
+		}
+
+		if ignoreWhitespace {
+			line2 = strings.ReplaceAll(line2, " ", "")
+			line2 = strings.ReplaceAll(line2, "\t", "")
+		}
+
+		differences = append(differences, Difference{Type: ">", Start: lineNumber2, End: lineNumber2, Text: line2})
 		j++
 		lineNumber2++
 	}
@@ -141,6 +219,10 @@ func compareLines(lines1, lines2 []string) ([]Difference, []DifferenceBlock) {
 
 func printDifferences(differences []Difference, blocks []DifferenceBlock) {
 	fmt.Println("Результат сравнения:")
+	insideChangeBlock := false // Новая переменная
+	comparedStart := 0
+	comparedEnd := 0
+
 	for i := 0; i < len(differences); {
 		if differences[i].Type == ">" {
 			startIndex := i
@@ -152,12 +234,13 @@ func printDifferences(differences []Difference, blocks []DifferenceBlock) {
 			if differences[startIndex].Start == 1 {
 				fmt.Printf("%d a %d,%d\n", differences[startIndex].Start-1, differences[startIndex].Start, differences[endIndex-1].End)
 			} else {
-				fmt.Printf("%d a %d,%d\n", differences[startIndex].Start, differences[startIndex].Start, differences[endIndex-1].End)
+				fmt.Printf("%d a %d,%d\n", differences[startIndex].Start-1, differences[startIndex].Start, differences[endIndex-1].End)
 			}
 			for j := startIndex; j < endIndex; j++ {
-				fmt.Printf("%d %s %s\n", differences[j].Start, differences[j].Type, differences[j].Text)
+				fmt.Printf("%s %s\n", differences[j].Type, differences[j].Text)
 			}
 			i = endIndex
+			insideChangeBlock = false // Сбрасываем флаг блока изменений
 		} else if differences[i].Type == "<" {
 			startIndex := i
 			endIndex := i
@@ -167,9 +250,10 @@ func printDifferences(differences []Difference, blocks []DifferenceBlock) {
 			blocks = append(blocks, DifferenceBlock{StartLineNumber: differences[startIndex].Start, EndLineNumber: differences[endIndex-1].End})
 			fmt.Printf("%d d %d,%d\n", differences[startIndex].Start, differences[startIndex].Start, differences[endIndex-1].End)
 			for j := startIndex; j < endIndex; j++ {
-				fmt.Printf("%d %s %s\n", differences[j].Start, differences[j].Type, differences[j].Text)
+				fmt.Printf("%s %s\n", differences[j].Type, differences[j].Text)
 			}
 			i = endIndex
+			insideChangeBlock = false // Сбрасываем флаг блока изменений
 		} else if differences[i].Type == "c" {
 			startIndex := i
 			endIndex := i
@@ -178,13 +262,33 @@ func printDifferences(differences []Difference, blocks []DifferenceBlock) {
 			}
 			blocks = append(blocks, DifferenceBlock{StartLineNumber: differences[startIndex].Start, EndLineNumber: differences[endIndex-1].End})
 			fmt.Printf("%d c %d\n", differences[startIndex].Start, differences[endIndex-1].End)
+
+			// Включаем флаг блока изменений
+			insideChangeBlock = true
+			comparedStart = differences[startIndex].Start
+			comparedEnd = differences[endIndex-1].End
 			for j := startIndex; j < endIndex; j++ {
-				fmt.Printf("%d < %s \n", differences[j].Start, differences[j].Text)
+				if j == startIndex {
+					fmt.Printf("< %s \n", differences[j].Text)
+				} else {
+					fmt.Printf("> %s \n", differences[j].Text)
+				}
+
+				if j < endIndex-1 {
+					fmt.Println("---")
+				}
 			}
 			i = endIndex
 		} else {
 			fmt.Printf("%d %s %s\n", differences[i].Start, differences[i].Type, differences[i].Text)
 			i++
+			insideChangeBlock = false // Сбрасываем флаг блока изменений
 		}
+
+		// Пропускаем удаленные строки, если внутри блока изменений
+		for i < len(differences) && insideChangeBlock && differences[i].Type == "<" && differences[i].Start > comparedStart && differences[i].End < comparedEnd+2 {
+			i++
+		}
+		insideChangeBlock = false
 	}
 }
