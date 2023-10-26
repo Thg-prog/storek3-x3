@@ -6,7 +6,6 @@
 
 template <typename T>
 class ThreadTree {
-    //template <typename U>
     struct Element {
         Element* left;
         Element* right;
@@ -353,7 +352,6 @@ bool ThreadTree<T>::findEl(const T& val, const Element* el) const noexcept {
 }
 
 template <typename T>
-//const ThreadTree<T>::Element* ThreadTree<T>::findTreeEl(const T& val, const Element* el) const noexcept {
 const typename ThreadTree<T>::Element* ThreadTree<T>::findTreeEl(const T& val, const Element* el) const noexcept {
     if (el == nullptr) {
         return nullptr;
