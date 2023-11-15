@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-N = 50
+N = 120
 x1 = np.random.random(N)
 x2 = np.random.random(N)
 x3 = [1] * N
@@ -9,47 +9,39 @@ x3 = [1] * N
 def activation(x):
     return 1 if x > 0 else 0
 
-def forward(xs, weights):
+def forward_hidden(xs, weights):
     s = np.dot(weights, xs)
-    out = [activation(value) for value in s]
+    out = []
+    for value in s:
+        local_ar = []
+        for val in value:
+            local_ar.append(activation(val))
+        out.append(local_ar)
     return out
 
+def forward_out(xs, weights):
+    s = np.dot(weights, xs)
+    return [activation(value) for value in s]
+
 def hidden_layers():
-    W1 = np.array([-1, -1, 1.5])
-    W2 = np.array([-1, -1, 0.5])
-    W3 = np.array([-1, 1, -0.5])
-    W4 = np.array([1, -1, -0.5])
-
-    X = np.array([x1, x2, x3])
-    result1 = forward(X, W1)
-    result2 = forward(X, W2)
-    result3 = forward(X, W3)
-    result4 = forward(X, W4)
-
-    return result1, result2, result3, result4
+    weights = np.array([[0, 1, -0.2], [0, 1, -0.8], [-1.5, -1, 0.65], [1.5, 1, -1.85], [-1.5, 1, -0.35], [1.5, -1, -0.85]])
+    x_in = np.array([x1, x2, x3])
+    return forward_hidden(x_in, weights)
 
 def main_layer(results):
-    X = np.array([results[i] for i in range(len(results))])
-    W = np.array([1, -1, -1, -1])
-    result = forward(X, W)
-    return result
+    weights = np.array([1, -1, -1, -1, -1, -1])
+    return forward_out(results, weights)
 
 def graph(result):
-    A = [0, 0.5]
-    B = [0.5, 0]
-    C = [1, 0.5]
-    D = [0.5, 1]
-    E = [0.5, 0]
-    F = [1, 0.5]
-    G = [1, 0.5]
-    H = [0.5, 0]
+    x = [0.3, 0.7, 0.9, 0.7, 0.3, 0.1, 0.3]
+    y = [0.2, 0.2, 0.5, 0.8, 0.8, 0.5, 0.2]
     for i in range(N):
         if result[i] == 1:
             plt.scatter(x1[i], x2[i], c='green')
         else:
             plt.scatter(x1[i], x2[i], c='red')
 
-    plt.plot(A, B, C, D, E, F, G, H)
+    plt.plot(x, y)
     plt.show()
 
 def main():
