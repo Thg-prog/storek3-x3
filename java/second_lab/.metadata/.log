@@ -1,0 +1,122 @@
+
+!ENTRY org.eclipse.jdt.launching 4 4 2023-09-04 18:51:23.528
+!MESSAGE Нет такого файла или каталога
+!STACK 0
+java.io.IOException: Нет такого файла или каталога
+	at java.base/java.io.UnixFileSystem.createFileExclusively(Native Method)
+	at java.base/java.io.File.createNewFile(File.java:1043)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin.writeInstallInfo(LaunchingPlugin.java:1111)
+	at org.eclipse.jdt.internal.launching.LaunchingPlugin$1.saving(LaunchingPlugin.java:576)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:394)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:210)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:45)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:213)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1171)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2421)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:554)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+
+!ENTRY org.eclipse.core.resources 4 2 2023-09-04 18:51:23.531
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: Problems while saving variables and containers
+	at org.eclipse.jdt.internal.core.JavaModelManager.saveVariablesAndContainers(JavaModelManager.java:4423)
+	at org.eclipse.jdt.internal.core.JavaModelManager.savingTimed(JavaModelManager.java:4653)
+	at org.eclipse.jdt.internal.core.JavaModelManager.saving(JavaModelManager.java:4639)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:394)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:210)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:45)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:213)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1171)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2421)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:554)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+Caused by: java.io.FileNotFoundException: /home/ostapenkoigor/java_progs/second_lab/.metadata/.plugins/org.eclipse.jdt.core/variablesAndContainers.dat (Нет такого файла или каталога)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:235)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:184)
+	at org.eclipse.jdt.internal.core.JavaModelManager.saveVariablesAndContainers(JavaModelManager.java:4418)
+	... 10 more
+!SUBENTRY 1 org.eclipse.jdt.core 4 4 2023-09-04 18:51:23.532
+!MESSAGE Problems while saving variables and containers
+!STACK 0
+java.io.FileNotFoundException: /home/ostapenkoigor/java_progs/second_lab/.metadata/.plugins/org.eclipse.jdt.core/variablesAndContainers.dat (Нет такого файла или каталога)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:235)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:184)
+	at org.eclipse.jdt.internal.core.JavaModelManager.saveVariablesAndContainers(JavaModelManager.java:4418)
+	at org.eclipse.jdt.internal.core.JavaModelManager.savingTimed(JavaModelManager.java:4653)
+	at org.eclipse.jdt.internal.core.JavaModelManager.saving(JavaModelManager.java:4639)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:394)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:210)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:45)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:213)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1171)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2421)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:554)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+!SUBENTRY 1 org.eclipse.jdt.core 4 4 2023-09-04 18:51:23.533
+!MESSAGE Problems while saving variables and containers
+!STACK 0
+java.io.FileNotFoundException: /home/ostapenkoigor/java_progs/second_lab/.metadata/.plugins/org.eclipse.jdt.core/variablesAndContainers.dat (Нет такого файла или каталога)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:235)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:184)
+	at org.eclipse.jdt.internal.core.JavaModelManager.saveVariablesAndContainers(JavaModelManager.java:4418)
+	at org.eclipse.jdt.internal.core.JavaModelManager.savingTimed(JavaModelManager.java:4653)
+	at org.eclipse.jdt.internal.core.JavaModelManager.saving(JavaModelManager.java:4639)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:394)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:210)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:45)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:213)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1171)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2421)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:554)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+
+!ENTRY org.eclipse.m2e.logback.appender 4 0 2023-09-04 18:51:23.539
+!MESSAGE Can't write workspace state
+!STACK 0
+java.io.FileNotFoundException: /home/ostapenkoigor/java_progs/second_lab/.metadata/.plugins/org.eclipse.m2e.core/workspaceState.ser (Нет такого файла или каталога)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:235)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:184)
+	at org.eclipse.m2e.core.internal.project.registry.ProjectRegistryReader.createObjectOutputStream(ProjectRegistryReader.java:128)
+	at org.eclipse.m2e.core.internal.project.registry.ProjectRegistryReader.writeWorkspaceState(ProjectRegistryReader.java:117)
+	at org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager.writeWorkspaceState(ProjectRegistryManager.java:990)
+	at org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager.saving(ProjectRegistryManager.java:1141)
+	at org.eclipse.core.internal.resources.SaveManager.executeLifecycle(SaveManager.java:394)
+	at org.eclipse.core.internal.resources.SaveManager$1.run(SaveManager.java:210)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:45)
+	at org.eclipse.core.internal.resources.SaveManager.broadcastLifecycle(SaveManager.java:213)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1171)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2421)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:554)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+
+!ENTRY org.eclipse.ui.ide 4 4 2023-09-04 18:51:26.656
+!MESSAGE Problems saving workspace
+
+!ENTRY org.eclipse.ui.ide 4 1 2023-09-04 18:51:26.657
+!MESSAGE Problems occurred while trying to save the state of the workbench.
+!SUBENTRY 1 org.eclipse.core.resources 4 568 2023-09-04 18:51:26.657
+!MESSAGE Could not write workspace metadata '/home/ostapenkoigor/java_progs/second_lab/.metadata/.plugins/org.eclipse.core.resources/.root/1.tree'.
+!STACK 0
+java.io.FileNotFoundException: /home/ostapenkoigor/java_progs/second_lab/.metadata/.plugins/org.eclipse.core.resources/.root/1.tree (Нет такого файла или каталога)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:235)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:184)
+	at org.eclipse.core.internal.localstore.SafeFileOutputStream.<init>(SafeFileOutputStream.java:55)
+	at org.eclipse.core.internal.resources.SaveManager.saveTree(SaveManager.java:1393)
+	at org.eclipse.core.internal.resources.SaveManager.save(SaveManager.java:1175)
+	at org.eclipse.core.internal.resources.Workspace.save(Workspace.java:2421)
+	at org.eclipse.ui.internal.ide.application.IDEWorkbenchAdvisor.lambda$1(IDEWorkbenchAdvisor.java:554)
+	at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)
+
+!ENTRY org.eclipse.core.resources 2 10035 2023-09-04 18:51:27.395
+!MESSAGE The workspace will exit with unsaved changes in this session.
