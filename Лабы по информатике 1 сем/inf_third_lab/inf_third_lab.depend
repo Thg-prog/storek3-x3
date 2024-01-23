@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1668262718 source:d:\c projects\inf_third_lab\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1668262720 source:e:\inf_third_lab\main.c
+	<stdio.h>
+	<stdlib.h>
+
