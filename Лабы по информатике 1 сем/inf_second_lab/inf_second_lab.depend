@@ -1,9 +1,0 @@
-# depslib dependency file v1.0
-1668255469 source:d:\c projects\inf_second_lab\main.c
-	<stdio.h>
-	<stdlib.h>
-
-1668952462 source:e:\inf_second_lab\main.c
-	<stdio.h>
-	<stdlib.h>
-
